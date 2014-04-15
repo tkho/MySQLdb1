@@ -108,7 +108,36 @@ typedef struct {
 extern PyTypeObject _mysql_ResultObject_Type;
 
 static int _mysql_server_init_done = 0;
-#if MYSQL_VERSION_ID >= 40000
+
+pthread_key_t MYSQL_THREAD_MAINTENANCE_KEY;
+
+void pthread_cleanup(void *unused) {
+    if (_mysql_server_init_done) {
+        mysql_thread_end();
+    }
+}
+
+#if MYSQL_VERSION_ID >= 50030
+#define check_server_init(x) \
+    if (!_mysql_server_init_done) { \
+        if (mysql_library_init(0, NULL, NULL)) { \
+            _mysql_Exception(NULL); \
+            return x; \
+        } \
+        if (pthread_key_create(&MYSQL_THREAD_MAINTENANCE_KEY, pthread_cleanup)) { \
+            _mysql_Exception(NULL); \
+            return x; \
+        } \
+        _mysql_server_init_done = 1; \
+    } \
+    if (pthread_getspecific(MYSQL_THREAD_MAINTENANCE_KEY) == NULL) { \
+        mysql_thread_init(); \
+        if (pthread_setspecific(MYSQL_THREAD_MAINTENANCE_KEY, MYSQL_THREAD_MAINTENANCE_KEY)) { \
+            _mysql_Exception(NULL); \
+            return x; \
+        } \
+    }
+#elif MYSQL_VERSION_ID >= 40000
 #define check_server_init(x) if (!_mysql_server_init_done) { if (mysql_server_init(0, NULL, NULL)) { _mysql_Exception(NULL); return x; } else { _mysql_server_init_done = 1;} }
 #else
 #define check_server_init(x) if (!_mysql_server_init_done) _mysql_server_init_done = 1
@@ -344,6 +373,12 @@ static PyObject *_mysql_server_init(
 		_mysql_Exception(NULL);
 		goto finish;
 	}
+#if MYSQL_VERSION_ID >= 50030
+    if (pthread_key_create(&MYSQL_THREAD_MAINTENANCE_KEY, pthread_cleanup)) {
+        _mysql_Exception(NULL);
+        goto finish;
+    }
+#endif
 #endif
 	ret = Py_None;
 	Py_INCREF(Py_None);
@@ -362,7 +397,9 @@ static PyObject *_mysql_server_end(
 	PyObject *self,
 	PyObject *args) {
 	if (_mysql_server_init_done) {
-#if MYSQL_VERSION_ID >= 40000
+#if MYSQL_VERSION_ID >= 50030
+		mysql_library_end();
+#elif MYSQL_VERSION_ID >= 40000
 		mysql_server_end();
 #endif
 		_mysql_server_init_done = 0;
@@ -2764,7 +2801,7 @@ PyTypeObject _mysql_ConnectionObject_Type = {
 	PyObject_HEAD_INIT(NULL)
 	0,
 #endif
-	"_mysql.connection", /* (char *)tp_name For printing */
+	"_mysql_embedded.connection", /* (char *)tp_name For printing */
 	sizeof(_mysql_ConnectionObject),
 	0,
 	(destructor)_mysql_ConnectionObject_dealloc, /* tp_dealloc */
@@ -2852,7 +2889,7 @@ PyTypeObject _mysql_ResultObject_Type = {
 	PyObject_HEAD_INIT(NULL)
 	0,
 #endif
-	"_mysql.result",
+	"_mysql_embedded.result",
 	sizeof(_mysql_ResultObject),
 	0,
 	(destructor)_mysql_ResultObject_dealloc, /* tp_dealloc */
@@ -3044,7 +3081,7 @@ an argument are now methods of the result object. Deprecated functions\n\
 #ifdef IS_PY3K
 static struct PyModuleDef _mysqlmodule = {
    PyModuleDef_HEAD_INIT,
-   "_mysql",   /* name of module */
+   "_mysql_embedded",   /* name of module */
    _mysql___doc__, /* module documentation, may be NULL */
    -1,       /* size of per-interpreter state of the module,
                 or -1 if the module keeps state in global variables. */
@@ -3055,7 +3092,7 @@ PyMODINIT_FUNC
 PyInit__mysql(void)
 #else
 DL_EXPORT(void)
-init_mysql(void)
+init_mysql_embedded(void)
 #endif
 {
 	PyObject *dict, *module, *emod, *edict;
@@ -3063,7 +3100,7 @@ init_mysql(void)
     module = PyModule_Create(&_mysqlmodule);
 	if (!module) return module; /* this really should never happen */
 #else
-	module = Py_InitModule4("_mysql", _mysql_methods, _mysql___doc__,
+	module = Py_InitModule4("_mysql_embedded", _mysql_methods, _mysql___doc__,
 				(PyObject *)NULL, PYTHON_API_VERSION);
 	if (!module) return; /* this really should never happen */
 #endif
