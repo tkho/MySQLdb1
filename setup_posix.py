@@ -87,7 +87,7 @@ def get_config():
     create_release_file(metadata)
     del metadata['version_info']
     ext_options = dict(
-        name = "_mysql",
+        name = "_mysql_embedded",
         library_dirs = library_dirs,
         libraries = libraries,
         extra_compile_args = extra_compile_args,
