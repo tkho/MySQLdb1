@@ -1,11 +1,11 @@
-"""MySQLdb type conversion module
+"""MySQLdb_embedded type conversion module
 
 This module handles all the type conversions for MySQL. If the default
 type conversions aren't what you need, you can make your own. The
 dictionary conversions maps some kind of type to a conversion function
 which returns the corresponding value:
 
-Key: FIELD_TYPE.* (from MySQLdb.constants)
+Key: FIELD_TYPE.* (from MySQLdb_embedded.constants)
 
 Conversion function:
 
@@ -32,9 +32,9 @@ MySQL.connect().
 
 """
 
-from _mysql import string_literal, escape_sequence, escape_dict, escape, NULL
-from MySQLdb.constants import FIELD_TYPE, FLAG
-from MySQLdb.times import *
+from _mysql_embedded import string_literal, escape_sequence, escape_dict, escape, NULL
+from MySQLdb_embedded.constants import FIELD_TYPE, FLAG
+from MySQLdb_embedded.times import *
 
 try:
     from types import IntType, LongType, FloatType, NoneType, TupleType, ListType, DictType, InstanceType, \
@@ -89,7 +89,7 @@ def Thing2Literal(o, d):
     
     """Convert something into a SQL string literal.  If using
     MySQL-3.23 or newer, string_literal() is a method of the
-    _mysql.MYSQL object, and this function will be overridden with
+    _mysql_embedded.MYSQL object, and this function will be overridden with
     that method when the connection is created."""
 
     return string_literal(o, d)

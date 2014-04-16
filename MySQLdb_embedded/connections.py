@@ -1,16 +1,16 @@
 """
 
-This module implements connections for MySQLdb. Presently there is
+This module implements connections for MySQLdb_embedded. Presently there is
 only one class: Connection. Others are unlikely. However, you might
 want to make your own subclasses. In most cases, you will probably
 override Connection.default_cursor with a non-standard Cursor class.
 
 """
-from MySQLdb import cursors
+from MySQLdb_embedded import cursors
 from _mysql_exceptions import Warning, Error, InterfaceError, DataError, \
      DatabaseError, OperationalError, IntegrityError, InternalError, \
      NotSupportedError, ProgrammingError
-import types, _mysql
+import types, _mysql_embedded
 import re
 
 
@@ -53,7 +53,7 @@ def numeric_part(s):
     return None
 
 
-class Connection(_mysql.connection):
+class Connection(_mysql_embedded.connection):
 
     """MySQL Database Connection Object"""
 
@@ -85,7 +85,7 @@ class Connection(_mysql.connection):
           string, location of unix_socket to use
 
         conv
-          conversion dictionary, see MySQLdb.converters
+          conversion dictionary, see MySQLdb_embedded.converters
 
         connect_timeout
           number of seconds to wait before the connection attempt
@@ -148,8 +148,8 @@ class Connection(_mysql.connection):
         documentation for the MySQL C API for some hints on what they do.
 
         """
-        from MySQLdb.constants import CLIENT, FIELD_TYPE
-        from MySQLdb.converters import conversions
+        from MySQLdb_embedded.constants import CLIENT, FIELD_TYPE
+        from MySQLdb_embedded.converters import conversions
         from weakref import proxy
 
         kwargs2 = kwargs.copy()
@@ -179,7 +179,7 @@ class Connection(_mysql.connection):
         sql_mode = kwargs2.pop('sql_mode', '')
 
         client_flag = kwargs.get('client_flag', 0)
-        client_version = tuple([ numeric_part(n) for n in _mysql.get_client_info().split('.')[:2] ])
+        client_version = tuple([ numeric_part(n) for n in _mysql_embedded.get_client_info().split('.')[:2] ])
         if client_version >= (4, 1):
             client_flag |= CLIENT.MULTI_STATEMENTS
         if client_version >= (5, 0):
@@ -240,7 +240,7 @@ class Connection(_mysql.connection):
     def autocommit(self, on):
         on = bool(on)
         if self.get_autocommit() != on:
-            _mysql.connection.autocommit(self, on)
+            _mysql_embedded.connection.autocommit(self, on)
 
     def cursor(self, cursorclass=None):
         """
@@ -286,7 +286,7 @@ class Connection(_mysql.connection):
              DeprecationWarning, 2)
         self.query("BEGIN")
 
-    if not hasattr(_mysql.connection, 'warning_count'):
+    if not hasattr(_mysql_embedded.connection, 'warning_count'):
 
         def warning_count(self):
             """Return the number of warnings generated from the

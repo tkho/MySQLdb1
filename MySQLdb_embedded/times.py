@@ -7,7 +7,7 @@ Use Python datetime module to handle date and time columns."""
 import math
 from time import localtime
 from datetime import date, datetime, time, timedelta
-from _mysql import string_literal
+from _mysql_embedded import string_literal
 
 Date = date
 Time = time

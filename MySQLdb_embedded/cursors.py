@@ -1,7 +1,7 @@
-"""MySQLdb Cursors
+"""MySQLdb_embedded Cursors
 
-This module implements Cursors of various types for MySQLdb. By
-default, MySQLdb uses the Cursor class.
+This module implements Cursors of various types for MySQLdb_embedded. By
+default, MySQLdb_embedded uses the Cursor class.
 
 """
 
@@ -58,7 +58,7 @@ class BaseCursor(object):
     description_flags
         Tuple of column flags for last query, one entry per column
         in the result set. Values correspond to those in
-        MySQLdb.constants.FLAG. See MySQL documentation (C API)
+        MySQLdb_embedded.constants.FLAG. See MySQL documentation (C API)
         for more information. Non-standard extension.
     
     arraysize

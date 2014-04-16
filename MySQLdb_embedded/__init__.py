@@ -1,6 +1,6 @@
-"""MySQLdb - A DB API v2.0 compatible interface to MySQL.
+"""MySQLdb_embedded - A DB API v2.0 compatible interface to MySQL.
 
-This package is a wrapper around _mysql, which mostly implements the
+This package is a wrapper around _mysql_embedded, which mostly implements the
 MySQL C API.
 
 connect() -- connects to server
@@ -8,27 +8,27 @@ connect() -- connects to server
 See the C API specification and the MySQL documentation for more info
 on other items.
 
-For information on how MySQLdb handles type conversion, see the
-MySQLdb.converters module.
+For information on how MySQLdb_embedded handles type conversion, see the
+MySQLdb_embedded.converters module.
 
 """
 
 __revision__ = """$Revision$"""[11:-2]
-from MySQLdb.release import __version__, version_info, __author__
+from MySQLdb_embedded.release import __version__, version_info, __author__
 
-import _mysql
+import _mysql_embedded
 
-if version_info != _mysql.version_info:
-    raise ImportError("this is MySQLdb version %s, but _mysql is version %r" %
-                      (version_info, _mysql.version_info))
+if version_info != _mysql_embedded.version_info:
+    raise ImportError("this is MySQLdb_embedded version %s, but _mysql_embedded is version %r" %
+                      (version_info, _mysql_embedded.version_info))
 
 threadsafety = 1
 apilevel = "2.0"
 paramstyle = "format"
 
-from _mysql import *
-from MySQLdb.constants import FIELD_TYPE
-from MySQLdb.times import Date, Time, Timestamp, \
+from _mysql_embedded import *
+from MySQLdb_embedded.constants import FIELD_TYPE
+from MySQLdb_embedded.times import Date, Time, Timestamp, \
     DateFromTicks, TimeFromTicks, TimestampFromTicks
 
 try:
@@ -77,7 +77,7 @@ def Binary(x):
 
 def Connect(*args, **kwargs):
     """Factory function for connections.Connection."""
-    from MySQLdb.connections import Connection
+    from MySQLdb_embedded.connections import Connection
     return Connection(*args, **kwargs)
 
 connect = Connection = Connect
