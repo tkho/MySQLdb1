@@ -839,6 +839,7 @@ _mysql_ConnectionObject_close(
 	_mysql_ConnectionObject *self,
 	PyObject *args)
 {
+	check_server_init(NULL);
 	if (args) {
 		if (!PyArg_ParseTuple(args, "")) return NULL;
 	}
@@ -868,6 +869,7 @@ _mysql_ConnectionObject_affected_rows(
 	PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	return PyLong_FromUnsignedLongLong(mysql_affected_rows(&(self->connection)));
 }
@@ -903,6 +905,7 @@ _mysql_ConnectionObject_dump_debug_info(
 {
 	int err;
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	err = mysql_dump_debug_info(&(self->connection));
@@ -1104,6 +1107,7 @@ _mysql_ConnectionObject_errno(
 	PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	return PyInt_FromLong((long)mysql_errno(&(self->connection)));
 }
@@ -1120,6 +1124,7 @@ _mysql_ConnectionObject_error(
 	PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 #ifdef IS_PY3K
 	return PyUnicode_FromString(mysql_error(&(self->connection)));
@@ -1693,6 +1698,7 @@ _mysql_ConnectionObject_change_user(
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|ss:change_user",
 					 kwlist, &user, &pwd, &db))
 		return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 		r = mysql_change_user(&(self->connection), user, pwd, db);
@@ -1715,6 +1721,7 @@ _mysql_ConnectionObject_character_set_name(
 {
 	const char *s;
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 #if MYSQL_VERSION_ID >= 32321
 	s = mysql_character_set_name(&(self->connection));
@@ -1742,6 +1749,7 @@ _mysql_ConnectionObject_set_character_set(
 	const char *s;
 	int err;
 	if (!PyArg_ParseTuple(args, "s", &s)) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	err = mysql_set_character_set(&(self->connection), s);
@@ -1783,6 +1791,7 @@ _mysql_ConnectionObject_get_character_set_info(
 	MY_CHARSET_INFO cs;
 	
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	mysql_get_character_set_info(&(self->connection), &cs);
 	if (!(result = PyDict_New())) return NULL;
@@ -1841,6 +1850,7 @@ _mysql_ConnectionObject_get_host_info(
 	PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 #ifdef IS_PY3K
 	return PyUnicode_FromString(mysql_get_host_info(&(self->connection)));
@@ -1860,6 +1870,7 @@ _mysql_ConnectionObject_get_proto_info(
 	PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	return PyInt_FromLong((long)mysql_get_proto_info(&(self->connection)));
 }
@@ -1875,6 +1886,7 @@ _mysql_ConnectionObject_get_server_info(
 	PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 #ifdef IS_PY3K
 	return PyUnicode_FromString(mysql_get_server_info(&(self->connection)));
@@ -1896,6 +1908,7 @@ _mysql_ConnectionObject_info(
 {
 	const char *s;
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	s = mysql_info(&(self->connection));
 #ifdef IS_PY3K
@@ -1935,6 +1948,7 @@ _mysql_ConnectionObject_insert_id(
 {
 	my_ulonglong r;
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	r = mysql_insert_id(&(self->connection));
@@ -1954,6 +1968,7 @@ _mysql_ConnectionObject_kill(
 	unsigned long pid;
 	int r;
 	if (!PyArg_ParseTuple(args, "k:kill", &pid)) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	r = mysql_kill(&(self->connection), pid);
@@ -1975,6 +1990,7 @@ _mysql_ConnectionObject_field_count(
 	PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 #if MYSQL_VERSION_ID < 32224
 	return PyInt_FromLong((long)mysql_num_fields(&(self->connection)));
@@ -2038,6 +2054,7 @@ _mysql_ConnectionObject_ping(
 {
 	int r, reconnect = -1;
 	if (!PyArg_ParseTuple(args, "|I", &reconnect)) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	if ( reconnect != -1 ) self->connection.reconnect = reconnect;
 	Py_BEGIN_ALLOW_THREADS
@@ -2062,6 +2079,7 @@ _mysql_ConnectionObject_query(
 	char *query;
 	int len, r;
 	if (!PyArg_ParseTuple(args, "s#:query", &query, &len)) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	r = mysql_real_query(&(self->connection), query, len);
@@ -2092,6 +2110,7 @@ _mysql_ConnectionObject_select_db(
 	char *db;
 	int r;
 	if (!PyArg_ParseTuple(args, "s:select_db", &db)) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	r = mysql_select_db(&(self->connection), db);
@@ -2113,6 +2132,7 @@ _mysql_ConnectionObject_shutdown(
 {
 	int r;
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	r = mysql_shutdown(&(self->connection)
@@ -2140,6 +2160,7 @@ _mysql_ConnectionObject_stat(
 {
 	const char *s;
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	s = mysql_stat(&(self->connection));
@@ -2168,6 +2189,7 @@ _mysql_ConnectionObject_store_result(
 	_mysql_ResultObject *r=NULL;
 
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	arglist = Py_BuildValue("(OiO)", self, 0, self->converter);
 	if (!arglist) goto error;
@@ -2207,6 +2229,7 @@ _mysql_ConnectionObject_thread_id(
 {
 	unsigned long pid;
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	Py_BEGIN_ALLOW_THREADS
 	pid = mysql_thread_id(&(self->connection));
@@ -2229,6 +2252,7 @@ _mysql_ConnectionObject_use_result(
 	_mysql_ResultObject *r=NULL;
 
 	if (!PyArg_ParseTuple(args, "")) return NULL;
+	check_server_init(NULL);
 	check_connection(self);
 	arglist = Py_BuildValue("(OiO)", self, 1, self->converter);
 	if (!arglist) return NULL;
