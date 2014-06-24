@@ -28,7 +28,10 @@ def enabled(options, option):
         raise ValueError("Unknown value %s for option %s" % (value, option))
 
 def create_release_file(metadata):
-    rel = open("MySQLdb/release.py",'w')
+    import os
+    if not os.path.exists("MySQLdb_embedded/release.py"):
+        return
+    rel = open("MySQLdb_embedded/release.py",'w')
     rel.write("""
 __author__ = "%(author)s <%(author_email)s>"
 version_info = %(version_info)s
