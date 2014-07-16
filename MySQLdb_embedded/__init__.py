@@ -16,7 +16,7 @@ if embedded_version_info != _mysql_embedded.version_info:
                       (embedded_version_info, _mysql_embedded.version_info))
 
 from MySQLdb import *
-if version_info != embedded_version_info:
+if version_info != (1, 2, 5, 'final', 1):
     raise ImportError("this is MySQLdb_embedded version %s, but _mysql is version %r" %
                       (embedded_version_info, _mysql.version_info))
 
