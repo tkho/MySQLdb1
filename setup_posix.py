@@ -1,4 +1,5 @@
 import os, sys
+import platform
 from ConfigParser import SafeConfigParser
 
 # This dequote() business is required for some older versions
@@ -37,6 +38,9 @@ def get_config():
     extra_objects = []
     static = enabled(options, 'static')
     if enabled(options, 'embedded'):
+        if platform.system() == 'Darwin':
+            # no libmysqld.dylib on OS X
+            static = True
         libs = mysql_config("libmysqld-libs")
         client = "mysqld"
     elif enabled(options, 'threadsafe'):
