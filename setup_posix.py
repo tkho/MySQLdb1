@@ -38,11 +38,11 @@ def get_config():
     extra_objects = []
     static = enabled(options, 'static')
     if enabled(options, 'embedded'):
-        if platform.system() == 'Darwin':
-            # no libmysqld.dylib on OS X
-            static = True
+        static = True
         libs = mysql_config("libmysqld-libs")
         client = "mysqld"
+        if platform.system() == 'Linux':  # Tested with mysql 5.6.20
+            libs.append('-lstdc++')
     elif enabled(options, 'threadsafe'):
         libs = mysql_config("libs_r")
         client = "mysqlclient_r"
